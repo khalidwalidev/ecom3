@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  CLIENT
+}
+
+enum ClientPipelineStatus {
+  JOINED
+  MEETING
+  FINALIZING
+  LOGO_BRANDING
+  WEBSITE
+  SOCIAL_SETUP
+  PRODUCT_SOURCING_IMPORT
+  CONTENT_MARKETING
+  LAUNCHED
+  FIRST_SALE
+}
+
+enum PortfolioMediaType {
+  IMAGE
+  PDF
+  LINK
+}
+
+model User {
+  id           String  @id @default(cuid())
+  name         String
+  email        String  @unique
+  passwordHash String
+  role         Role    @default(CLIENT)
+  clientId     String? @unique
+  createdAt    DateTime @default(now())
+}
+
+model Client {
+  id           String   @id @default(cuid())
+  clientId     String   @unique
+  name         String
+  email        String
+  phone        String
+  packageName  String
+  status       ClientPipelineStatus
+  notes        String?
+  createdAt    DateTime @default(now())
+  statusHistory ClientStatusHistory[]
+}
+
+model ClientStatusHistory {
+  id             String   @id @default(cuid())
+  client         Client   @relation(fields: [clientId], references: [clientId])
+  clientId       String
+  status         ClientPipelineStatus
+  changedAt      DateTime @default(now())
+  changedByUserId String
+}
+
+model PortfolioItem {
+  id            String   @id @default(cuid())
+  title         String
+  slug          String   @unique
+  clientName    String
+  category      String
+  tags          String[]
+  description   String
+  coverImageUrl String
+  published     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  media         PortfolioMedia[]
+}
+
+model PortfolioMedia {
+  id              String   @id @default(cuid())
+  portfolioItem   PortfolioItem @relation(fields: [portfolioItemId], references: [id])
+  portfolioItemId String
+  type            PortfolioMediaType
+  url             String
+  caption         String?
+  sortOrder       Int      @default(0)
+}
+
+model Settings {
+  id                                String   @id @default(cuid())
+  usdToBdtRate                      Float
+  storageRatePerCubicMeterPerMonth  Float
+  packagingDefaults                 Json
+  updatedAt                         DateTime @updatedAt
+}

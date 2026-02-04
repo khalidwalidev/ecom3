@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-white text-slate-900 antialiased;
+}
+
+a {
+  @apply text-brand-700 hover:text-brand-600;
+}
+
+.section-padding {
+  @apply py-16 md:py-20;
+}
+
+.container-base {
+  @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+}
